@@ -1,25 +1,23 @@
+import { useCallback } from "react";
 import TodoItem from "./TodoItem";
 
 type Todo = {
   id: number;
-  text: string;
+  title: string;
   completed: boolean;
 };
 
 type TodoListProps = {
   todos: Todo[];
-  filter: "all" | "active" | "completed";
-  onToggle: (id: number) => void;
-  onDelete: (id: number) => void;
+  isLoading?: boolean;
 };
 
-export default function TodoList({
-  todos,
-  filter,
-  onToggle,
-  onDelete,
-}: TodoListProps) {
-  const getEmptyMessage = () => {
+export default function TodoList({ todos, isLoading = false }: TodoListProps) {
+  const filter = (
+    typeof window !== "undefined" ? window.location.hash.replace("#", "") : ""
+  ) as "all" | "active" | "completed" | "";
+
+  const getEmptyMessage = useCallback(() => {
     switch (filter) {
       case "completed":
         return "No completed tasks yet";
@@ -28,7 +26,7 @@ export default function TodoList({
       default:
         return "No tasks yet. Add one above!";
     }
-  };
+  }, [filter]);
 
   if (todos.length === 0) {
     return (
@@ -50,17 +48,21 @@ export default function TodoList({
       </div>
     );
   }
-
+  if (isLoading) {
+    return (
+      <div className="p-12 text-center text-zinc-400 dark:text-zinc-500">
+        <p className="text-lg">Loading tasks...</p>
+      </div>
+    );
+  }
   return (
-    <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
-      {todos.map((todo) => (
+    <div className="divide-y divide-zinc-200 dark:divide-zinc-700 max-h-80 overflow-y-auto">
+      {todos.map((todo, index) => (
         <TodoItem
-          key={todo.id}
+          key={index}
           id={todo.id}
-          text={todo.text}
+          title={todo.title}
           completed={todo.completed}
-          onToggle={onToggle}
-          onDelete={onDelete}
         />
       ))}
     </div>
