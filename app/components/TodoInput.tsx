@@ -9,7 +9,7 @@ export default function TodoInput() {
     mutationKey: ["addTodo"],
     mutationFn: TodoServices.createTodo,
     onSuccess: (response) => {
-      setValue("");
+        setValue("");
       queryClient.setQueryData(
         ["todos"],
         (oldData: { data: unknown[] } | undefined) => {
